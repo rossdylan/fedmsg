@@ -87,8 +87,9 @@ class Person(DeclarativeBase):
 
 
 def recipient_default(context):
+    Session = sessionmaker(context.engine)()
     person_id = context.current_parameters['person_id']
-    person = Person.query.filter_by(id=person_id).one()
+    person = Session.query(Person).filter_by(id=person_id).one()
     return hashlib.sha256(
         person.email + context.current_parameters['salt']
     ).hexdigest()
