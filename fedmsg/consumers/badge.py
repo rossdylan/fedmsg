@@ -2,9 +2,6 @@
 # Author: Ross Delinger
 # Description: Consumer for producing openbadges by listening for messages on fedmsg
 
-import fedmsg
-import fedmsg.json
-
 from paste.deploy.converters import asbool
 from moksha.api.hub.consumer import Consumer
 from model import Badge, Issuer, Assertion, Person
@@ -139,7 +136,9 @@ class FedoraBadgesConsumer(Consumer):
         self.DBSession.add(new_issuer)
         self.DBSession.commit()
 
-    def add_assertion(self, badge_id, person_id, issued_on):
+    def add_assertion(self, badge_id, person_id, issued_on=None):
+        if issued_on == None:
+            issued_on = date.now()
         if self.person_exists(person_id) and self.badge_exists(badge_id):
             new_assertion = Assertion(
                     badge_id=badge_id,
