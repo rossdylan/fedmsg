@@ -42,4 +42,26 @@ class FedoraBadgesConsumer(Consumer):
                     )
 
     def badge_exists(self, badge_id):
-        return self.DBSession.query.fil
+        """
+        Convience function to check if a badge with the specified ID exists
+
+        :type badge_id: str
+        :param badge_id: ID of the badge to check
+        """
+
+        return self.DBSession.query(Person.id).filter_by(id=badge_id).count() == 0
+
+    def add_badge(self, id, name, image, desc, criteria, issuer_id):
+        if not self.badge_exists(id):
+            new_badge = Badge(
+                        id=id,
+                        name=name,
+                        image=image,
+                        description=desc,
+                        criteria=criteria,
+                        issuer_id=issuer_id
+                        )
+            self.DBSession.add(new_badge)
+
+    def consume(self, msg):
+        pass
