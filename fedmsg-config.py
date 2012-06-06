@@ -64,7 +64,26 @@ config = dict(
         ),
     ],
 
+    # Options for the fedmsg-fedbadges services
+    badges_global = dict(
+            database_uri='sqlite:///fedbadges.db',
+            badge_issuer=dict(
+                issuer_id='Fedora Project',
+                issuer_origin='http://badges.fedora.com',
+                issuer_name='Fedora Project',
+                issuer_org='http://fedora.org',
+                issuer_contact='rdelinge@redhat.com'
+                )
+    ),
 
+    examplebadge_badges = [
+            dict(
+                badge_name='Example_Badge',
+                badge_image='http://3.bp.blogspot.com/-XhjKweGVJHI/TZBrIJugrBI/AAAAAAAAAJM/ozRJi2bLAK4/s1600/fedora-logo.png',
+                badge_desc='An Example Badge awarded for being an example',
+                badge_criteria='Being an example'
+                ),
+    ],
     ## For the fedmsg-hub and fedmsg-relay. ##
 
     # We almost always want the fedmsg-hub to be sending messages with zmq as
