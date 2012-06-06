@@ -17,20 +17,20 @@ class FedoraBadgesConsumer(Consumer):
 
     def __init__(self, hub, name):
         self.name = name
-        self.DBSession = None
         self.badges = {}
         ENABLED = 'fedmsg.consumers.badges.{0}.enabled'.format(self.name)
         if not asbool(hub.config.get(ENABLED, False)):
             log.info('fedmsg.consumers.badges.{0} disabled'.format(self.name))
+            return
 
         global_settings = hub.config.get("badges_global")
 
         database_uri = global_settings.get('database_uri', '')
         if database_uri == '':
             raise Exception('Badges consumer requires a database uri')
+            return
         self.DBSessionMaker = sessionmaker(bind=create_engine(database_uri))
         self.DBSession = scoped_session(self.DBSessionMaker)
-
         issuer = global_settings.get('badge_issuer')
         self.issuer_id = self.add_issuer(
                 issuer.get('issuer_origin'),
@@ -103,8 +103,8 @@ class FedoraBadgesConsumer(Consumer):
         :type person_id: int
         :param person_id: the ID of this person
         """
-
-        return self.DBSession.query(Person.id).filter_by(id=person_id).count() != 0
+        session = scoped_session(self.DBSessionMaker)
+        return session.query(Person.id).filter_by(id=person_id).count() != 0
 
     def add_person(self, person_id, email):
         """
@@ -117,18 +117,21 @@ class FedoraBadgesConsumer(Consumer):
         :param email: the Email of this Person
         """
 
+        session = scoped_session(self.DBSessionMaker)
         if not self.person_exists(person_id):
             new_person = Person(
                     id=person_id,
                     email=email
                     )
-            self.DBSession.add(new_person)
-            self.DBSession.commit()
+            session.add(new_person)
+            session.commit()
 
     def issuer_exists(self, issuer_id):
-        return self.DBSession.query(Issuer).filter_by(id=issuer_id).count() != 0
+        session = scoped_session(self.DBSessionMaker)
+        return session.query(Issuer).filter_by(id=issuer_id).count() != 0
 
     def add_issuer(self, origin, name, org, contact):
+        session = scoped_session(self.DBSessionMaker)
         issuer_id = hash(origin + name)
         if not self.issuer_exists(issuer_id):
             new_issuer = Issuer(
@@ -138,8 +141,8 @@ class FedoraBadgesConsumer(Consumer):
                     org=org,
                     contact=contact
                     )
-            self.DBSession.add(new_issuer)
-            self.DBSession.commit()
+            session.add(new_issuer)
+            session.commit()
         return issuer_id
 
     def award_badge(self, email, badge_id, issued_on=None):
@@ -148,6 +151,7 @@ class FedoraBadgesConsumer(Consumer):
         self.add_assertion(badge_id, person_id, issued_on)
 
     def add_assertion(self, badge_id, person_id, issued_on):
+        session = scoped_session(self.DBSessionMaker)
         if issued_on == None:
             issued_on = date.now()
         if self.person_exists(person_id) and self.badge_exists(badge_id):
@@ -156,8 +160,8 @@ class FedoraBadgesConsumer(Consumer):
                     person_id=person_id,
                     issued_on=issued_on
                     )
-            self.DBSession.add(new_assertion)
-            self.DBSession.commit()
+            session.add(new_assertion)
+            session.commit()
 
     def consume(self, msg):
         """

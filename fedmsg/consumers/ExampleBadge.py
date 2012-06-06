@@ -1,4 +1,6 @@
 import badge
+import logging
+log = logging.getLogger("moksha.hub")
 
 class ExampleBadgesConsumer(badge.FedoraBadgesConsumer):
     topic = "org.fedoraproject.*"
@@ -9,10 +11,14 @@ class ExampleBadgesConsumer(badge.FedoraBadgesConsumer):
 
     def consume(self, msg):
         topic, body = msg.get('topic'), msg.get('body')
-
-        if body.startswith("example_thing"):
-            parts = body.split(" ")[1:]
-            email = parts[0]
+        if type(body) == type(""):
+            return
+        body = body.get('msg')
+        print body.get('action')
+        if body.get('action') == 'This guy did some awesome thing!':
+            email = body.get('email')
+            print "Issuing 'Example Badge' to {0}".format(email)
+            log.info("Awarding 'Example Badge' to {0}".format(email))
             badge_id = "example_badge"
             self.award_badge(email, badge_id)
 
