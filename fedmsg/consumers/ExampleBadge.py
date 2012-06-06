@@ -5,7 +5,7 @@ class ExampleBadgesConsumer(badge.FedoraBadgesConsumer):
 
     def __init__(self, hub):
         self.name = "examplebadge"
-        super(badge.FedoraBadgesConsumer, self).__init__(hub, self.name)
+        super(ExampleBadgesConsumer, self).__init__(hub, self.name)
 
     def consume(self, msg):
         topic, body = msg.get('topic'), msg.get('body')

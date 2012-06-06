@@ -6,7 +6,7 @@ from paste.deploy.converters import asbool
 from moksha.api.hub.consumer import Consumer
 from model import Badge, Issuer, Assertion, Person
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from datetime import date
 
 import logging
@@ -28,7 +28,8 @@ class FedoraBadgesConsumer(Consumer):
         database_uri = global_settings.get('database_uri', '')
         if database_uri == '':
             raise Exception('Badges consumer requires a database uri')
-        self.DBSession = sessionmaker(engine=create_engine(database_uri))
+        self.DBSessionMaker = sessionmaker(bind=create_engine(database_uri))
+        self.DBSession = scoped_session(self.DBSessionMaker)
 
         issuer = global_settings.get('badge_issuer')
         self.issuer_id = self.add_issuer(
@@ -47,6 +48,7 @@ class FedoraBadgesConsumer(Consumer):
                     badge.get('badge_criteria'),
                     self.issuer_id
                     )
+        return super(FedoraBadgesConsumer, self).__init__(hub)
 
     def badge_exists(self, badge_id):
         """
@@ -58,7 +60,7 @@ class FedoraBadgesConsumer(Consumer):
 
         return self.DBSession.query(Badge.id).filter_by(id=badge_id).count() != 0
 
-    def add_badge(self, id, name, image, desc, criteria, issuer_id):
+    def add_badge(self, name, image, desc, criteria, issuer_id):
         """
         Add a new badge to the database
 
