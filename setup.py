@@ -7,6 +7,8 @@ except ImportError:
     use_setuptools()
     from setuptools import setup
 
+import sys
+
 f = open('README.rst')
 long_description = f.read().strip()
 long_description = long_description.split('split here', 1)[1]
@@ -20,28 +22,38 @@ try:
 except Exception:
     pass
 
+
+install_requires = [
+    'pyzmq',
+    'simplejson',
+    'fabulous',
+    'moksha>=0.8.0',
+]
+
+if sys.version_info[0] == 2 and sys.version_info[1] <= 6:
+    install_requires.append('argparse')
+
+
 setup(
     name='fedmsg',
-    version='0.1.5',
+    version='0.1.6',
     description="Fedora Messaging Client API",
     long_description=long_description,
     author='Ralph Bean',
     author_email='rbean@redhat.com',
     url='http://github.com/ralphbean/fedmsg/',
     license='LGPLv2+',
-    install_requires=[
-        'pyzmq',
-        'simplejson',
-        'fabulous',
-        'moksha>=0.8.0',
+    install_requires=install_requires,
+    tests_require=[
+        'nose',
     ],
-    tests_require=['nose'],
     test_suite='nose.collector',
     packages=[
         'fedmsg',
         'fedmsg.commands',
         'fedmsg.consumers',
         'fedmsg.producers',
+        'fedmsg.tests',
     ],
     include_package_data=True,
     zip_safe=False,

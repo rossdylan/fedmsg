@@ -5,7 +5,7 @@ config = dict(
     endpoints={
         # This is the output side of the relay to which all other
         # services can listen.
-        "relay_outbound": "tcp://*:4001",
+        "relay_outbound": ["tcp://*:4001"],
 
         # For other, more 'normal' services, fedmsg will try to guess the
         # name of it's calling module to determine which endpoint definition
