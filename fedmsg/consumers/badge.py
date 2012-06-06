@@ -19,9 +19,9 @@ class FedoraBadgesConsumer(Consumer):
         self.name = name
         self.DBSession = None
         self.badges = {}
-        ENABLED = 'fedmsg.consumers.{0}.enabled'.format(self.name)
+        ENABLED = 'fedmsg.consumers.badges.{0}.enabled'.format(self.name)
         if not asbool(hub.config.get(ENABLED, False)):
-            log.info('fedmsg.consumers.{0} disabled'.format(self.name))
+            log.info('fedmsg.consumers.badges.{0} disabled'.format(self.name))
 
         global_settings = hub.config.get("badges_global")
 
@@ -30,25 +30,22 @@ class FedoraBadgesConsumer(Consumer):
             raise Exception('Badges consumer requires a database uri')
         self.DBSession = sessionmaker(engine=create_engine(database_uri))
 
-        issuer_settings = hub.config.get("{0}_issuers".format(self.name))
-        for issuer in issuer_settings:
-            self.add_issuer(
-                    issuer.get('issuer_id'),
-                    issuer.get('issuer_origin'),
-                    issuer.get('issuer_name'),
-                    issuer.get('issuer_org'),
-                    issuer.get('issuer_contact')
-                    )
+        issuer = global_settings.get('badge_issuer')
+        self.issuer_id = self.add_issuer(
+                issuer.get('issuer_origin'),
+                issuer.get('issuer_name'),
+                issuer.get('issuer_org'),
+                issuer.get('issuer_contact')
+                )
 
         badges_settings = hub.config.get("{0}_badges".format(self.name))
         for badge in badges_settings:
             self.add_badge(
-                    badge.get('badge_id'),
                     badge.get('badge_name'),
                     badge.get('badge_image'),
                     badge.get('badge_desc'),
                     badge.get('badge_criteria'),
-                    badge.get('issuer_id')
+                    self.issuer_id
                     )
 
     def badge_exists(self, badge_id):
@@ -128,7 +125,8 @@ class FedoraBadgesConsumer(Consumer):
             self.DBSession.add(new_person)
             self.DBSession.commit()
 
-    def add_issuer(self, id, origin, name, org, contact):
+    def add_issuer(self, origin, name, org, contact):
+        id = hash(origin + name)
         new_issuer = Issuer(
                 id=id,
                 origin=origin,
@@ -138,6 +136,7 @@ class FedoraBadgesConsumer(Consumer):
                 )
         self.DBSession.add(new_issuer)
         self.DBSession.commit()
+        return id
 
     def award_badge(self, email, badge_id, issued_on=None):
         person_id = hash(email)
