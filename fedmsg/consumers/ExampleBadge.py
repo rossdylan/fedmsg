@@ -1,8 +1,9 @@
-import badge
+import badges
+from badges import FedoraBadgesConsumer
 import logging
 log = logging.getLogger("moksha.hub")
 
-class ExampleBadgesConsumer(badge.FedoraBadgesConsumer):
+class ExampleBadgesConsumer(FedoraBadgesConsumer):
     topic = "org.fedoraproject.*"
 
     def __init__(self, hub):

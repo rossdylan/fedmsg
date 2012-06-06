@@ -52,6 +52,7 @@ setup(
         'fedmsg',
         'fedmsg.commands',
         'fedmsg.consumers',
+        'fedmsg.consumers.badges',
         'fedmsg.producers',
         'fedmsg.tests',
     ],
