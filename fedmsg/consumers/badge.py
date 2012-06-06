@@ -57,8 +57,7 @@ class FedoraBadgesConsumer(Consumer):
         :type badge_id: str
         :param badge_id: ID of the badge to check
         """
-
-        return self.DBSession.query(Badge.id).filter_by(id=badge_id).count() != 0
+        return self.DBSession.query(Badge).filter_by(id=badge_id).count() != 0
 
     def add_badge(self, name, image, desc, criteria, issuer_id):
         """
@@ -82,10 +81,9 @@ class FedoraBadgesConsumer(Consumer):
         :type issuer_id: str
         :param issuer_id: ID of the Issuer who issued this badge
         """
-
-        if not self.badge_exists(id):
+        badge_id = name.lower()
+        if not self.badge_exists(badge_id):
             new_badge = Badge(
-                        id=id,
                         name=name,
                         image=image,
                         description=desc,
@@ -96,19 +94,19 @@ class FedoraBadgesConsumer(Consumer):
             self.DBSession.commit()
 
         if not id in self.badges:
-            self.badges[id] = issuer_id
+            self.badges[badge_id] = issuer_id
 
-    def person_exists(self, id):
+    def person_exists(self, person_id):
         """
         Check if a person with this ID exists in our database
 
-        :type id: int
-        :param id: the ID of this person
+        :type person_id: int
+        :param person_id: the ID of this person
         """
 
-        return self.DBSession.query(Person.id).filter_by(id=id).count() != 0
+        return self.DBSession.query(Person.id).filter_by(id=person_id).count() != 0
 
-    def add_person(self, id, email):
+    def add_person(self, person_id, email):
         """
         Add a new Person to the database
 
@@ -119,22 +117,22 @@ class FedoraBadgesConsumer(Consumer):
         :param email: the Email of this Person
         """
 
-        if not self.person_exists(id):
+        if not self.person_exists(person_id):
             new_person = Person(
-                    id=id,
+                    id=person_id,
                     email=email
                     )
             self.DBSession.add(new_person)
             self.DBSession.commit()
 
-    def issuer_exists(self, id):
-        return self.DBSession.query(Issuer.id).filter_by(id=id).count() != 0
+    def issuer_exists(self, issuer_id):
+        return self.DBSession.query(Issuer).filter_by(id=issuer_id).count() != 0
 
     def add_issuer(self, origin, name, org, contact):
-        id = hash(origin + name)
-        if not self.issuer_exists(id):
+        issuer_id = hash(origin + name)
+        if not self.issuer_exists(issuer_id):
             new_issuer = Issuer(
-                    id=id,
+                    id=issuer_id,
                     origin=origin,
                     name=name,
                     org=org,
@@ -142,7 +140,7 @@ class FedoraBadgesConsumer(Consumer):
                     )
             self.DBSession.add(new_issuer)
             self.DBSession.commit()
-        return id
+        return issuer_id
 
     def award_badge(self, email, badge_id, issued_on=None):
         person_id = hash(email)
