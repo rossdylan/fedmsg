@@ -18,7 +18,7 @@ class FedoraBadgesConsumer(Consumer):
     def __init__(self, hub, name):
         self.name = name
         self.DBSession = None
-
+        self.badges = {}
         ENABLED = 'fedmsg.consumers.{0}.enabled'.format(self.name)
         if not asbool(hub.config.get(ENABLED, False)):
             log.info('fedmsg.consumers.{0} disabled'.format(self.name))
@@ -96,6 +96,9 @@ class FedoraBadgesConsumer(Consumer):
             self.DBSession.add(new_badge)
             self.DBSession.commit()
 
+        if not id in self.badges:
+            self.badges[id] = issuer_id
+
     def person_exists(self, id):
         """
         Check if a person with this ID exists in our database
@@ -136,7 +139,12 @@ class FedoraBadgesConsumer(Consumer):
         self.DBSession.add(new_issuer)
         self.DBSession.commit()
 
-    def add_assertion(self, badge_id, person_id, issued_on=None):
+    def award_badge(self, email, badge_id, issued_on=None):
+        person_id = hash(email)
+        self.add_person(person_id, email)
+        self.add_assertion(badge_id, person_id, issued_on)
+
+    def add_assertion(self, badge_id, person_id, issued_on):
         if issued_on == None:
             issued_on = date.now()
         if self.person_exists(person_id) and self.badge_exists(badge_id):
