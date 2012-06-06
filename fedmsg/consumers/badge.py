@@ -7,7 +7,7 @@ from moksha.api.hub.consumer import Consumer
 from model import Badge, Issuer, Assertion, Person
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-from datetime import date
+from datetime import datetime
 
 import logging
 log = logging.getLogger("moksha.hub")
@@ -57,7 +57,8 @@ class FedoraBadgesConsumer(Consumer):
         :type badge_id: str
         :param badge_id: ID of the badge to check
         """
-        return self.DBSession.query(Badge).filter_by(id=badge_id).count() != 0
+        session = scoped_session(self.DBSessionMaker)
+        return session.query(Badge).filter_by(id=badge_id).count() != 0
 
     def add_badge(self, name, image, desc, criteria, issuer_id):
         """
@@ -81,6 +82,7 @@ class FedoraBadgesConsumer(Consumer):
         :type issuer_id: str
         :param issuer_id: ID of the Issuer who issued this badge
         """
+        session = scoped_session(self.DBSessionMaker)
         badge_id = name.lower()
         if not self.badge_exists(badge_id):
             new_badge = Badge(
@@ -90,8 +92,8 @@ class FedoraBadgesConsumer(Consumer):
                         criteria=criteria,
                         issuer_id=issuer_id
                         )
-            self.DBSession.add(new_badge)
-            self.DBSession.commit()
+            session.add(new_badge)
+            session.commit()
 
         if not id in self.badges:
             self.badges[badge_id] = issuer_id
@@ -153,7 +155,7 @@ class FedoraBadgesConsumer(Consumer):
     def add_assertion(self, badge_id, person_id, issued_on):
         session = scoped_session(self.DBSessionMaker)
         if issued_on == None:
-            issued_on = date.now()
+            issued_on = datetime.now()
         if self.person_exists(person_id) and self.badge_exists(badge_id):
             new_assertion = Assertion(
                     badge_id=badge_id,
