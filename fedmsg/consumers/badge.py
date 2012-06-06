@@ -127,17 +127,21 @@ class FedoraBadgesConsumer(Consumer):
             self.DBSession.add(new_person)
             self.DBSession.commit()
 
+    def issuer_exists(self, id):
+        return self.DBSession.query(Issuer.id).filter_by(id=id).count() != 0
+
     def add_issuer(self, origin, name, org, contact):
         id = hash(origin + name)
-        new_issuer = Issuer(
-                id=id,
-                origin=origin,
-                name=name,
-                org=org,
-                contact=contact
-                )
-        self.DBSession.add(new_issuer)
-        self.DBSession.commit()
+        if not self.issuer_exists(id):
+            new_issuer = Issuer(
+                    id=id,
+                    origin=origin,
+                    name=name,
+                    org=org,
+                    contact=contact
+                    )
+            self.DBSession.add(new_issuer)
+            self.DBSession.commit()
         return id
 
     def award_badge(self, email, badge_id, issued_on=None):
