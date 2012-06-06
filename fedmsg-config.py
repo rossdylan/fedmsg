@@ -11,13 +11,13 @@ config = dict(
         # name of it's calling module to determine which endpoint definition
         # to use.  This can be overridden by explicitly providing the name in
         # the initial call to fedmsg.init(...).
-        "bodhi.marat": "tcp://*:3001",
-        "fas.marat": "tcp://*:3002",
-        "fedoratagger.marat": "tcp://*:3003",
-        "mediawiki.marat": "tcp://*:3004",
-        "pkgdb.marat": "tcp://*:3005",
+        #"bodhi.marat": "tcp://*:3001",
+        #"fas.marat": "tcp://*:3002",
+        #"fedoratagger.marat": "tcp://*:3003",
+        #"mediawiki.marat": "tcp://*:3004",
+        #"pkgdb.marat": "tcp://*:3005",
 
-        "busmon.marat": "tcp://*:3006",
+        #"busmon.marat": "tcp://*:3006",
     },
 
     # This is the address of an active->passive relay.  It is used for the

@@ -54,10 +54,12 @@ setup(
             "fedmsg-relay=fedmsg.commands.relay:relay",
             "fedmsg-config=fedmsg.commands.config:config",
             "fedmsg-irc=fedmsg.commands.ircbot:ircbot",
+            "fedmsg-badges=fedmsg.commands.badges:badges",
         ],
         'moksha.consumer': [
             "fedmsg-relay=fedmsg.consumers.relay:RelayConsumer",
             "fedmsg-ircbot=fedmsg.consumers.ircbot:IRCBotConsumer",
+            "fedmsg-badges=fedmsg.consumers.ExampleBadge:ExampleBadgesConsumer"
         ],
         'moksha.producer': [
             "heartbeat=fedmsg.producers.heartbeat:HeartbeatProducer",
