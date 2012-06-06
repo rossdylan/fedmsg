@@ -27,6 +27,7 @@ install_requires = [
     'pyzmq',
     'simplejson',
     'fabulous',
+    'kitchen',
     'moksha>=0.8.0',
 ]
 
@@ -70,6 +71,7 @@ setup(
             "fedmsg-badges=fedmsg.commands.badges:badges",
         ],
         'moksha.consumer': [
+            "fedmsg-dummy=fedmsg.consumers.dummy:DummyConsumer",
             "fedmsg-relay=fedmsg.consumers.relay:RelayConsumer",
             "fedmsg-ircbot=fedmsg.consumers.ircbot:IRCBotConsumer",
             "fedmsg-badges=fedmsg.consumers.ExampleBadge:ExampleBadgesConsumer"

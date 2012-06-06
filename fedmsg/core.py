@@ -6,6 +6,8 @@ import time
 import warnings
 import zmq
 
+from kitchen.text.converters import to_utf8
+
 import fedmsg.json
 
 
@@ -130,6 +132,9 @@ class FedMsgContext(object):
                 topic,
             ])
 
+        if type(topic) == unicode:
+            topic = to_utf8(topic)
+
         msg = dict(topic=topic, msg=msg, timestamp=time.time())
 
         self.publisher.send_multipart([topic, fedmsg.json.dumps(msg)])
@@ -194,5 +199,6 @@ class FedMsgContext(object):
                             if timeout and (time.time() - tic) > timeout:
                                 return
         finally:
-            for _name, endpoint in endpoints.iteritems():
-                subs[endpoint].close()
+            for _name, endpoint_list in endpoints.iteritems():
+                for endpoint in endpoint_list:
+                    subs[endpoint].close()
