@@ -18,7 +18,6 @@ class ExampleBadgesConsumer(FedoraBadgesConsumer):
         print body.get('action')
         if body.get('action') == 'This guy did some awesome thing!':
             email = body.get('email')
-            print "Issuing 'Example Badge' to {0}".format(email)
             log.info("Awarding 'Example Badge' to {0}".format(email))
             badge_id = "example_badge"
             self.award_badge(email, badge_id)
