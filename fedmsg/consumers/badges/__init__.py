@@ -15,6 +15,8 @@ class FedoraBadgesConsumer(Consumer):
     def __init__(self, hub, name):
         self.name = name
         self.badges = {}
+        self.hub = hub
+        self.DBSession = None
         ENABLED = 'fedmsg.consumers.badges.{0}.enabled'.format(self.name)
         if not asbool(hub.config.get(ENABLED, False)):
             log.info('fedmsg.consumers.badges.{0} disabled'.format(self.name))
@@ -27,6 +29,7 @@ class FedoraBadgesConsumer(Consumer):
             raise Exception('Badges consumer requires a database uri')
             return
         self.tahrir = TahrirDatabase(database_uri)
+        self.DBSession = self.tahrir.DBSessionMaker
         issuer = global_settings.get('badge_issuer')
         self.issuer_id = self.tahrir.add_issuer(
                 issuer.get('issuer_origin'),
