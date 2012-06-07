@@ -29,7 +29,7 @@ class FedoraBadgesConsumer(Consumer):
             raise Exception('Badges consumer requires a database uri')
             return
         self.tahrir = TahrirDatabase(database_uri)
-        self.DBSession = self.tahrir.DBSessionMaker
+        self.DBSession = self.tahrir.session_maker
         issuer = global_settings.get('badge_issuer')
         self.issuer_id = self.tahrir.add_issuer(
                 issuer.get('issuer_origin'),
