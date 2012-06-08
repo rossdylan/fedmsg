@@ -31,13 +31,17 @@ class TahrirDatabase(object):
             session.add(new_badge)
             session.commit()
 
-    def person_exists(self, person_id):
+    def person_exists(self, person_email):
         session = scoped_session(self.session_maker)
-        return session.query(Person).filter_by(id=person_id).count() != 0
+        return session.query(Person).filter_by(email=person_email).count() != 0
+
+    def get_person(self,person_email):
+        session = scoped_session(self.session_maker)
+        return session.query(Person).filter_by(email=person_email).one()
 
     def add_person(self, person_id, email):
         session = scoped_session(self.session_maker)
-        if not self.person_exists(person_id):
+        if not self.person_exists(email):
             new_person = Person(
                     id=person_id,
                     email=email
@@ -64,14 +68,14 @@ class TahrirDatabase(object):
             session.commit()
         return issuer_id
 
-    def add_assertion(self, badge_id, person_id, issued_on):
+    def add_assertion(self, badge_id, person_email, issued_on):
         session = scoped_session(self.session_maker)
         if issued_on == None:
             issued_on = datetime.now()
-        if self.person_exists(person_id) and self.badge_exists(badge_id):
+        if self.person_exists(person_email) and self.badge_exists(badge_id):
             new_assertion = Assertion(
                     badge_id=badge_id,
-                    person_id=person_id,
+                    person_id=self.get_person(person_email).id,
                     issued_on=issued_on
                     )
             session.add(new_assertion)

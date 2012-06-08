@@ -53,7 +53,7 @@ class FedoraBadgesConsumer(Consumer):
     def award_badge(self, email, badge_id, issued_on=None):
         person_id = hash(email)
         self.tahrir.add_person(person_id, email)
-        self.tahrir.add_assertion(badge_id, person_id, issued_on)
+        self.tahrir.add_assertion(badge_id, email, issued_on)
 
     def consume(self, msg):
         """
