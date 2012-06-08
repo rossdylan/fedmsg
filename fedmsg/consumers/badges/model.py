@@ -2,7 +2,7 @@ import hashlib
 
 from sqlalchemy import (
     Column,
-    Integer,
+    BigInteger,
     DateTime,
     Unicode,
     ForeignKey,
@@ -22,7 +22,7 @@ DeclarativeBase = declarative_base()
 
 class Issuer(DeclarativeBase):
     __tablename__ = 'issuers'
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     origin = Column(Unicode(128), nullable=False)
     name = Column(Unicode(128), nullable=False, unique=True)
     org = Column(Unicode(128), nullable=False)
@@ -53,7 +53,7 @@ class Badge(DeclarativeBase):
     description = Column(Unicode(128), nullable=False)
     criteria = Column(Unicode(128), nullable=False)
     assertions = relationship("Assertion", backref="badge")
-    issuer_id = Column(Integer, ForeignKey('issuers.id'), nullable=False)
+    issuer_id = Column(BigInteger, ForeignKey('issuers.id'), nullable=False)
 
     def __unicode__(self):
         return self.name
@@ -71,7 +71,7 @@ class Badge(DeclarativeBase):
 
 class Person(DeclarativeBase):
     __tablename__ = 'persons'
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     email = Column(Unicode(128), nullable=False, unique=True)
     assertions = relationship("Assertion", backref="person")
 
@@ -111,7 +111,7 @@ class Assertion(DeclarativeBase):
     id = Column(Unicode(128), primary_key=True, unique=True,
                 default=assertion_id_default)
     badge_id = Column(Unicode(128), ForeignKey('badges.id'), nullable=False)
-    person_id = Column(Integer, ForeignKey('persons.id'), nullable=False)
+    person_id = Column(BigInteger, ForeignKey('persons.id'), nullable=False)
     salt = Column(Unicode(128), nullable=False, default=salt_default)
     issued_on = Column(DateTime)
 
