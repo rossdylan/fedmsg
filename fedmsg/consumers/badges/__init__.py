@@ -11,6 +11,17 @@ log = logging.getLogger("moksha.hub")
 
 
 class FedoraBadgesConsumer(Consumer):
+    """
+    The Base class for creating fedmsg consumers that issue open badges
+    Provides a base that does all of the heavy lifting related to issuing badges.
+    All the subclass needs to do is have a topic, a name, and implement consume(self, msg)
+
+    :type hub: Moksha Hub
+    :param hub: the moksha hub we are getting our messages from
+
+    :type name: str
+    :param name: name of this consumer, used to get details from the config file
+    """
 
     def __init__(self, hub, name):
         self.name = name
@@ -51,6 +62,20 @@ class FedoraBadgesConsumer(Consumer):
 
 
     def award_badge(self, email, badge_id, issued_on=None):
+        """
+        A high level way to issue a badge to a Person
+        It adds the person if they don't exist, and creates an assertion for them
+
+        :type email: str
+        :param email: This person's email addr
+
+        :type badge_id: str
+        :param badge_id: the id of the badge being awarded
+
+        :type issued_on: DateTime
+        :param issued_on: A datetime object with the time this badge was issued
+        """
+
         person_id = hash(email)
         self.tahrir.add_person(person_id, email)
         self.tahrir.add_assertion(badge_id, email, issued_on)
@@ -59,5 +84,8 @@ class FedoraBadgesConsumer(Consumer):
         """
         Consume a single message, we pass here because every subclass is going
         to want to parse this slightly differently
+
+        :type msg: dict
+        :param msg: The message to be parsed
         """
         pass
