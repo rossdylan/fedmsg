@@ -20,7 +20,7 @@ How data moves through the system
 =================================
 
 Fedora Badges relies heavily on moving data around the Fedora Infrastructure
-applications. For Examplem, to award a badge for a users first successful build on Koji,
+applications. For Example, to award a badge for a users first successful build on Koji,
 we need to know when it happened. To facilitate this all the major applications that make up
 the infrastructure will be tied into Fedora Messaging. With this we can have a unifed way of
 moving data. The Fedora Badges Service will sit and listen on this messaging bus and when a
