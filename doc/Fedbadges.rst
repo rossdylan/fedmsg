@@ -74,8 +74,7 @@ Fedora Badges Config Files
 Since the core Fedora Badges service runs as a consume under fedmsg the config files for fedora badges are located
 in the same place as fedmsg and have the same format. This format is one of standard python files.
 There are two main configuration sections for Fedora Badges. The first section is the global config section which
-stores information on the database, and defines the issuer to issue badges with. An example of such a config section is as follows:
-.. code:: python
+stores information on the database, and defines the issuer to issue badges with. An example of such a config section is as follows:::
         config = dict(
             # Options for the fedmsg-fedbadges services
             badges_global = dict(
@@ -93,8 +92,7 @@ stores information on the database, and defines the issuer to issue badges with.
 The second config section for Fedora Badges is specific to each new Consumer. Each subclass of FedoraBadgesConsumer needs to
 set a name. In the example one section above, the name is 'examplebadge'. This name is used to go into the fedmsg config
 files and get sections labeled with that name. Right now all this does is get all the Open Badge definitions out of the config
-files and into the database. An example of this type of config section is below:
-.. code:: python
+files and into the database. An example of this type of config section is below:::
         config = dict(
             #An example badge definition
             examplebadge_badges = [
