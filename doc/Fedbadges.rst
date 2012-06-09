@@ -44,8 +44,7 @@ This service runs as a fedmsg consumer. The consumer listens on the fedmsg bus a
 it will act in some way. For simplicities sake there will be a base class that all Consumers awarding badges
 will inherit from. This super class handles database work, and getting values from config files. Classes that
 inherit from this super class only need to define a topic, a name, and then the code they want to run whenever
-a message is recieved. A simple example of such a subclass follows:
-.. code:: python
+a message is recieved. A simple example of such a subclass follows:::
         class ExampleBadgesConsumer(FedoraBadgesConsumer):
             topic = "org.fedoraproject.*"
 
