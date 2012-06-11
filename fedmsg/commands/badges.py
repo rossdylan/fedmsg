@@ -7,7 +7,7 @@ from fedmsg.commands import command
 
 extra_args = []
 
-@command(extra_args=extra_args)
+@command(name='fedmsg-badges', extra_args=extra_args, daemonizable=True)
 def badges(**kw):
     """ Relay connections to the bus, and enabled the badges consumer """
     moksha_options = dict(
