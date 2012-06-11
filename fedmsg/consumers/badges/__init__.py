@@ -4,7 +4,7 @@
 
 from paste.deploy.converters import asbool
 from moksha.api.hub.consumer import Consumer
-from dbapi import TahrirDatabase
+from tahrir_api.dbapi import TahrirDatabase
 
 import logging
 log = logging.getLogger("moksha.hub")
