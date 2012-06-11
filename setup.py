@@ -25,6 +25,7 @@ except Exception:
 
 install_requires = [
     'pyzmq',
+    'mysql-python',
     'simplejson',
     'fabulous',
     'kitchen',
