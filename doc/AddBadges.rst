@@ -52,6 +52,7 @@ called when the hub passes as a message. Consume is where badges are awarded. To
 award a badge, call self.award_badge with the badge id, and the email of the
 person receiving the badge.
 
+
 Adding badge information to the config file
 ===========================================
 
@@ -91,3 +92,9 @@ Where <badge name> is the name of the consumer you set in step one
 .. note:: Enabling new consumers may be moved to the config file in future
    versions
 
+Who can do each step
+====================
+
+Step's one and two can be done by any user who wants to contribute to fedbadges.
+Placing the consumer and config file into the proper place needs to be done by
+an admin along with enabling the new consumer in the badges.py command file. 
