@@ -19,6 +19,10 @@ To award badges a new Consumer based off of FedoraBadgesConsumer is required.
 This consumer sets what topic to listen for, and what the name of this consumer
 is. The name that is set is used to get information from the config file specific
 to that Consumer.::
+        from badges import FedoraBadgesConsumer
+        import logging
+        log = logging.getLogger("moksha.hub")
+
         class ExampleBadgesConsumer(FedoraBadgesConsumer):
             topic = "org.fedoraproject.*"
 
