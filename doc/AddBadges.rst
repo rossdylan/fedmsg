@@ -25,11 +25,11 @@ is used to get information from the config file specific to that Consumer.::
         log = logging.getLogger("moksha.hub")
 
         class ExampleBadgesConsumer(FedoraBadgesConsumer):
-            topic = "org.fedoraproject.*"
+            topic = "org.fedoraproject.*" #  Limit what messages we recieve
 
             def __init__(self, hub):
-                self.name = "examplebadge"
-                super(ExampleBadgesConsumer, self).__init__(hub, self.name)
+                self.name = "examplebadge" #set our name
+                super(ExampleBadgesConsumer, self).__init__(hub, self.name) # Make sure our superclass is aware of our name as well
 
             def consume(self, msg):
                 topic, body = msg.get('topic'), msg.get('body')
@@ -41,7 +41,7 @@ is used to get information from the config file specific to that Consumer.::
                     email = body.get('email')
                     log.info("Awarding 'Example Badge' to {0}".format(email))
                     badge_id = "example_badge"
-                    self.award_badge(email, badge_id)
+                    self.award_badge(email, badge_id) #  Award the badge
 
 
 This example is very simple. The topic is set at the top of the class. This is
