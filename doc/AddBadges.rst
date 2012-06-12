@@ -45,13 +45,15 @@ is used to get information from the config file specific to that Consumer.::
 
 
 This example is very simple. The topic is set at the top of the class. This is
-used to limit the messages that are sent to this Consumer. In the __init__
-function you can initialize other things the consumer requires, set the name of
-this consumer, and then call super to initialize the superclass which handles
-all the database calls and config parsing. After __init__ comes the consume
-method, which is called when the hub passes as a message. Consume is where
-badges are awarded. To award a badge, call self.award_badge with the badge id,
-and the email of the person receiving the badge.
+used to limit the messages that are sent to this Consumer. An example of a topic
+that limits this consumer to only messages from a service such as bodhi would be
+"org.fedoraproject.bodhi.*". In the __init__ function you can initialize other
+things the consumer requires, set the name of this consumer, and then call super
+to initialize the superclass which handles all the database calls and config
+parsing. After __init__ comes the consume method, which is called when the hub
+passes as a message. Consume is where badges are awarded. To award a badge, call
+self.award_badge with the badge id, and the email of the person receiving the
+badge.
 
 
 Adding badge information to the config file
