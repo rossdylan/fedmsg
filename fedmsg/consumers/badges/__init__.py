@@ -76,8 +76,7 @@ class FedoraBadgesConsumer(Consumer):
         :param issued_on: A datetime object with the time this badge was issued
         """
 
-        person_id = hash(email)
-        self.tahrir.add_person(person_id, email)
+        self.tahrir.add_person(email)
         self.tahrir.add_assertion(badge_id, email, issued_on)
 
     def consume(self, msg):
