@@ -7,7 +7,7 @@ There is no information here about *receiving* messages, only sending.
 +---------------+-----------+-----------+-----------+
 | Service       | Dev       |   Stg     |   Prod    |
 +===============+===========+===========+===========+
-| fedmsg-relay  | DONE      |  DONE     |           |
+| fedmsg-relay  | DONE      |  DONE     | DONE      |
 +---------------+-----------+-----------+-----------+
 | fedmsg-irc    | DONE      |  BLOCKED* |           |
 +---------------+-----------+-----------+-----------+
@@ -23,7 +23,7 @@ There is no information here about *receiving* messages, only sending.
 +---------------+-----------+-----------+-----------+
 | elections     |           |           |           |
 +---------------+-----------+-----------+-----------+
-| fas           | DONE      |           |           |
+| fas           | DONE      | DONE      |           |
 +---------------+-----------+-----------+-----------+
 | koji          |           |           |           |
 +---------------+-----------+-----------+-----------+
@@ -35,7 +35,7 @@ There is no information here about *receiving* messages, only sending.
 +---------------+-----------+-----------+-----------+
 | scm           | DONE      | DONE      |           |
 +---------------+-----------+-----------+-----------+
-| tagger        | DONE      | DONE      |           |
+| tagger        | DONE      | DONE      | DONE      |
 +---------------+-----------+-----------+-----------+
 | wiki          | DONE      | DONE      |           |
 +---------------+-----------+-----------+-----------+

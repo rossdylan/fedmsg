@@ -20,13 +20,13 @@ class RelayConsumer(FedmsgConsumer):
 
         super(RelayConsumer, self).__init__(hub)
 
-        self.validate_messages = False
+        self.validate_signatures = False
 
 
     def consume(self, msg):
         ## FIXME - for some reason twisted is screwing up fedmsg.
         #fedmsg.__context.publisher.send_multipart(
-        #    [msg['topic'], fedmsg.json.dumps(msg['body'])]
+        #    [msg['topic'], fedmsg.encoding.dumps(msg['body'])]
         #)
         #
         # We have to do this instead.  This works for the fedmsg-relay service
