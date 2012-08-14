@@ -103,7 +103,7 @@ function sign_message($message_obj) {
 
   # Step 1) - Load and encode the X509 cert
   $cert_obj = openssl_x509_read(file_get_contents(
-    $ssldir.'/certs/'.$certname.".pem"
+    $ssldir.'/'.$certname.".crt"
   ));
   $cert = "";
   openssl_x509_export($cert_obj, $cert);
@@ -111,7 +111,7 @@ function sign_message($message_obj) {
 
   # Step 2) - Load and sign the jsonified message with the RSA private key
   $rsa_private = openssl_get_privatekey(file_get_contents(
-    $ssldir.'/private_keys/'.$certname.".pem"
+    $ssldir.'/'.$certname.".key"
   ));
   $signature = "";
   openssl_sign($message, $signature, $rsa_private);
@@ -168,6 +168,7 @@ function article_save(
   } else {
     $titletext = $title->getText();
   }
+  $url = $title->getFullURL('diff=');
 
   # Just send on all the information we can...  change the attr names to be
   # more pythonic in style, though.
@@ -181,6 +182,7 @@ function article_save(
     "section_anchor" => $sectionanchor,
     "revision" => $revision,
     "base_rev_id" => $baseRevId,
+    "url" => $url,
     # TODO - flags?
     # TODO - status?
   );

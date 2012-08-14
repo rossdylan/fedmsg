@@ -1,3 +1,22 @@
+# This file is part of fedmsg.
+# Copyright (C) 2012 Red Hat, Inc.
+#
+# fedmsg is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# fedmsg is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with fedmsg; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Authors:  Ralph Bean <rbean@redhat.com>
+#
 # -*- coding; utf-8 -*-
 # Author: Ryan Brown
 # Author: Ralph Bean
@@ -5,6 +24,7 @@
 # regexes in specified IRC channels
 import fedmsg
 import fedmsg.encoding
+import fedmsg.text
 
 import copy
 import re
@@ -81,11 +101,12 @@ class FedMsngr(irc.IRCClient):
 class FedMsngrFactory(protocol.ClientFactory):
     protocol = FedMsngr
 
-    def __init__(self, channel, nickname, filters, pretty, parent_consumer):
+    def __init__(self, channel, nickname, filters, pretty, terse, parent_consumer):
         self.channel = channel
         self.nickname = nickname
         self.filters = filters
         self.pretty = pretty
+        self.terse = terse
         self.parent_consumer = parent_consumer
 
     def clientConnectionLost(self, connector, reason):
@@ -99,6 +120,7 @@ class FedMsngrFactory(protocol.ClientFactory):
 
 class IRCBotConsumer(FedmsgConsumer):
     topic = "org.fedoraproject.*"
+    validate_signatures = False
 
     def __init__(self, hub):
         self.hub = hub
@@ -121,10 +143,11 @@ class IRCBotConsumer(FedmsgConsumer):
             channel = "#" + channel
             nickname = settings.get('nickname', "fedmsg-bot")
             pretty = settings.get('make_pretty', False)
+            terse = settings.get('make_terse', False)
 
             filters = self.compile_filters(settings.get('filters', None))
 
-            factory = FedMsngrFactory(channel, nickname, filters, pretty, self)
+            factory = FedMsngrFactory(channel, nickname, filters, pretty, terse, self)
             reactor.connectTCP(network, port, factory)
 
         return super(IRCBotConsumer, self).__init__(hub)
@@ -157,46 +180,42 @@ class IRCBotConsumer(FedmsgConsumer):
                 return False
         return True
 
-    def prettify(self, msg, pretty=False):
+    def prettify(self, topic, msg, pretty=False, terse=False):
+        if terse:
+            return fedmsg.text.msg2repr(msg, **self.hub.config)
+
         msg = copy.deepcopy(msg)
+
         if msg.get('topic', None):
             msg.pop('topic')
+
         if msg.get('timestamp', None):
             msg['timestamp'] = time.ctime(msg['timestamp'])
+
         if pretty:
-            fancy = pygments.highlight(
+            msg = pygments.highlight(
                     fedmsg.encoding.pretty_dumps(msg),
                     pygments.lexers.JavascriptLexer(),
                     pygments.formatters.TerminalFormatter()
                     ).strip().encode('UTF-8')
-            return fancy
-        return msg
+
+        return "{0:<30} {1}".format(topic, msg)
 
     def consume(self, msg):
         """ Forward on messages from the bus to all IRC connections. """
         topic, body = msg.get('topic'), msg.get('body')
 
-        # We don't want to spam IRC with enormous base64 creds.
-        try:
-            body = fedmsg.crypto.strip_credentials(body)
-        except Exception, e:
-            log.warn("Failed to strip credentials from %r, %r" % (
-                type(body), body))
-
         for client in self.irc_clients:
-            if client.factory.filters:
-                if self.apply_filters(client.factory.filters, topic, body):
-                    _body = self.prettify(
-                        msg=body,
-                        pretty=client.factory.pretty
-                    )
-                    raw_msg = "{0:<30} {1}".format(topic, _body)
-                    client.msg(
-                        client.factory.channel,
-                        raw_msg,
-                    )
-            else:
-                raw_msg = fedmsg.encoding.pretty_dumps(msg)
+            if not client.factory.filters or (
+                client.factory.filters and
+                self.apply_filters(client.factory.filters, topic, body)
+            ):
+                raw_msg = self.prettify(
+                    topic=topic,
+                    msg=body,
+                    pretty=client.factory.pretty,
+                    terse=client.factory.terse,
+                )
                 client.msg(
                     client.factory.channel,
                     raw_msg,

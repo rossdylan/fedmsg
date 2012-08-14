@@ -17,27 +17,17 @@
 #
 # Authors:  Ralph Bean <rbean@redhat.com>
 #
-from datetime import timedelta
-from moksha.api.hub.producer import PollingProducer
-import zmq
+from fedmsg.text.base import BaseProcessor
 
-import fedmsg.encoding
-import logging
+class LoggerProcessor(BaseProcessor):
+    def handle_subtitle(self, msg, **config):
+        return 'logger.log' in msg['topic']
 
-log = logging.getLogger(__name__)
-
-class HeartbeatProducer(PollingProducer):
-    short_topic = "_heartbeat"
-    topic = "org.fedoraproject." + short_topic
-
-    frequency = timedelta(seconds=2)
-
-    def poll(self):
-        # FIXME -- this should use fedmsg.publish
-        try:
-            self.hub.send_message(
-                topic=self.topic,
-                message=fedmsg.encoding.dumps({'msg': "lub-dub"}),
-            )
-        except zmq.ZMQError, e:
-            log.warn("Could not emit heartbeat: %r" % e)
+    def subtitle(self, msg, **config):
+        if 'logger.log' in msg['topic']:
+            if 'log' in msg['msg']:
+                return msg['msg']['log']
+            else:
+                return self._("<custom JSON message>")
+        else:
+            raise NotImplementedError

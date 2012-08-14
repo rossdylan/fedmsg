@@ -17,27 +17,23 @@
 #
 # Authors:  Ralph Bean <rbean@redhat.com>
 #
-from datetime import timedelta
-from moksha.api.hub.producer import PollingProducer
-import zmq
+from fedmsg.text.base import BaseProcessor
 
-import fedmsg.encoding
-import logging
+class DefaultProcessor(BaseProcessor):
+    def handle_title(self, msg, **config):
+        return True
 
-log = logging.getLogger(__name__)
+    def handle_subtitle(self, msg, **config):
+        return True
 
-class HeartbeatProducer(PollingProducer):
-    short_topic = "_heartbeat"
-    topic = "org.fedoraproject." + short_topic
+    def handle_link(self, msg, **config):
+        return True
 
-    frequency = timedelta(seconds=2)
+    def title(self, msg, **config):
+        return '.'.join(msg['topic'].split('.')[3:])
 
-    def poll(self):
-        # FIXME -- this should use fedmsg.publish
-        try:
-            self.hub.send_message(
-                topic=self.topic,
-                message=fedmsg.encoding.dumps({'msg': "lub-dub"}),
-            )
-        except zmq.ZMQError, e:
-            log.warn("Could not emit heartbeat: %r" % e)
+    def subtitle(self, msg, **config):
+        return ""
+
+    def link(self, msg, **config):
+        return ""

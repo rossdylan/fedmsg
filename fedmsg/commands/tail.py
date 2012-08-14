@@ -1,4 +1,24 @@
+# This file is part of fedmsg.
+# Copyright (C) 2012 Red Hat, Inc.
+#
+# fedmsg is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# fedmsg is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with fedmsg; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+#
+# Authors:  Ralph Bean <rbean@redhat.com>
+#
 import pprint
+import re
 import time
 
 import pygments
@@ -28,6 +48,18 @@ extra_args = [
         'default': False,
         'action': 'store_true',
     }),
+    (['--filter'], {
+        'dest': 'exclusive_regexp',
+        'metavar': 'REGEXP',
+        'help': 'Only show topics that do not match the supplied regexp.',
+        'default': '_heartbeat',
+    }),
+    (['--regexp'], {
+        'dest': 'inclusive_regexp',
+        'metavar': 'REGEXP',
+        'help': 'Only show topics that match the supplied regexp.',
+        'default': '^((?!_heartbeat).)*$',
+    }),
 ]
 
 
@@ -39,6 +71,9 @@ def tail(**kw):
     kw['publish_endpoint'] = None
     # Disable timeouts.  We want to tail forever!
     kw['timeout'] = 0
+    # Even though fedmsg-tail won't be sending any messages, give it a name to
+    # conform with the other commands.
+    kw['name'] = 'relay_inbound'
     fedmsg.init(**kw)
 
     # Build a message formatter
@@ -59,6 +94,9 @@ def tail(**kw):
             ).strip()
             return "\n" + fancy
 
+    exclusive_regexp = re.compile(kw['exclusive_regexp'])
+    inclusive_regexp = re.compile(kw['inclusive_regexp'])
+
     # The "proper" fedmsg way to do this would be to spin up or connect to an
     # existing Moksha Hub and register a consumer on the "*" topic that simply
     # prints out each message it consumes.  That seems like overkill, so we're
@@ -66,7 +104,12 @@ def tail(**kw):
 
     # TODO -- colors?
     # TODO -- tabular layout?
-    for name, ep, topic, message in fedmsg.__context._tail_messages(**kw):
-        if '_heartbeat' in topic:
+    for name, ep, topic, message \
+            in fedmsg.__local.__context._tail_messages(**kw):
+        if exclusive_regexp.search(topic):
             continue
+
+        if not inclusive_regexp.search(topic):
+            continue
+
         print name, ep, topic, formatter(message)
